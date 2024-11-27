@@ -1,12 +1,20 @@
+import { match } from 'ts-pattern';
+
 export function server(port: number) {
-  return Deno.serve({ port }, async (req) => {
-    const echo = {
-      body: await req.text(),
-      headers: req.headers,
-      url: req.url,
-      method: req.method,
-    };
-    return res(JSON.stringify(echo));
+  return Deno.serve({ port }, (req) => {
+    const request = req as Request & { uri: URL }
+    request.uri = new URL(req.url);
+    return match(request)
+      .with({ method: 'GET', uri: { pathname: '/echo' } }, async () => {
+        const echo = {
+          body: await req.text(),
+          headers: req.headers,
+          url: req.url,
+          method: req.method,
+        };
+        return res(JSON.stringify(echo))
+      })
+      .otherwise(() => res('', { status: 404 }));
   });
 }
 

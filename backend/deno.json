@@ -3,6 +3,7 @@
     "dev": "deno run --allow-net=0.0.0.0:3000 --watch main.ts"
   },
   "imports": {
-    "@std/assert": "jsr:@std/assert@1"
+    "@std/assert": "jsr:@std/assert@1",
+    "ts-pattern": "npm:ts-pattern@^5.5.0"
   }
 }
