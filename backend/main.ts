@@ -1,4 +1,4 @@
-import { match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 
 const ROOM_FILE_PREFIX = "chat__room__";
 
@@ -8,6 +8,14 @@ export function server(port: number) {
     request.uri = new URL(req.url);
     return match(request)
       .with({ method: "POST", uri: { pathname: "/api/rooms" } }, createRoom)
+      .with({
+        method: "POST",
+        uri: {
+          pathname: P.when((p) =>
+            p.match(/^\/api\/rooms\/\w+\/messages/) != null
+          ),
+        },
+      }, publishMessage)
       .otherwise(() => res("", { status: 404 }));
   });
 }
@@ -26,6 +34,15 @@ async function createRoom(req: Request): Promise<Response> {
   }
   const roomFile = await Deno.makeTempFile({ prefix: ROOM_FILE_PREFIX });
   const [, roomId] = roomFile.split(ROOM_FILE_PREFIX);
+  Deno.writeTextFile(roomFile, JSON.stringify({ label, messages: [] }));
+  return res(JSON.stringify({ id: roomId, label }), { status: 201 });
+}
+
+async function publishMessage(req: Request): Promise<Response> {
+  const message = await req.json();
+  const [roomId] = req.url.match(/\/api\/rooms\/(\w+)\/messages/)!;
+  const roomFile = Deno.read;
+  Deno.writeTextFile(roomFile, JSON.stringify({ label, messages: [] }));
   Deno.writeTextFile(roomFile, JSON.stringify({ label, messages: [] }));
   return res(JSON.stringify({ id: roomId, label }), { status: 201 });
 }

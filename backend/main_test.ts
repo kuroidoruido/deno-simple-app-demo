@@ -40,12 +40,31 @@ describe("Chat", () => {
           response = await fetch(
             `http://localhost:${api.addr.port}/api/rooms`,
             {
-            method: "POST",
-            body: JSON.stringify({ label }),
+              method: "POST",
+              body: JSON.stringify({ label }),
             },
           );
           assertEquals(response.status, 400);
         });
       });
+  });
+
+  describe("POST /api/rooms/{roomId}/messages", () => {
+    it("should add a message", async () => {
+      response = await fetch(`http://localhost:${api.addr.port}/api/rooms`, {
+        method: "POST",
+        body: JSON.stringify({ label: "This is a name" }),
+      });
+      assertEquals(response.status, 201);
+      const room = await response.json();
+      response = await fetch(
+        `http://localhost:${api.addr.port}/api/rooms/${room.id}/messages`,
+        {
+          method: "POST",
+          body: JSON.stringify({ author: "John", message: "Hello!" }),
+        },
+      );
+      assertEquals(response.status, 201);
+    });
   });
 });
