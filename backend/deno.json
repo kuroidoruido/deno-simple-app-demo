@@ -1,9 +1,11 @@
 {
   "tasks": {
-    "dev": "deno run --allow-net=0.0.0.0:3000 --watch main.ts"
+    "dev": "deno run --allow-net=0.0.0.0:3000 --watch main.ts",
+    "test": "deno test --allow-net --allow-write --watch"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@1",
+    "@std/testing": "jsr:@std/testing@^1.0.5",
     "ts-pattern": "npm:ts-pattern@^5.5.0"
   }
 }
